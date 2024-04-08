@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="start_destination">Start Destination…</string>
+    <string name="end_destination">End Destination…</string>
+    <string name="distance_between_selected_destinations_km">Distance between selected destinations: %1$s km</string>
+    <string name="select_start_destination">Select start destination</string>
+    <string name="select_end_destination">Select end destination</string>
+    <string name="no_results_found">No results found</string>
+</resources>

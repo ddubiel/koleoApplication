@@ -1,16 +1,10 @@
 package com.koleo.koleoapplication.navigation
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavController
-import com.koleo.mylibrary.R
 import com.koleo.splash.SplashView
 
 data object SplashScreenSpec : ScreenSpec {

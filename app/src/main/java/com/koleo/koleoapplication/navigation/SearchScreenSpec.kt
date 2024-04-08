@@ -10,7 +10,7 @@ import com.koleo.search.SearchView
 import com.koleo.search.SearchViewModel
 import com.koleo.search.SearchViewState
 
-data object SearchScreenSpec: ScreenSpec {
+data object SearchScreenSpec : ScreenSpec {
     override val route: String
         get() = "search"
 
@@ -25,6 +25,6 @@ data object SearchScreenSpec: ScreenSpec {
 fun SearchDestination(
     viewModel: SearchViewModel = hiltViewModel()
 ) {
-    val viewState : State<SearchViewState> = viewModel.uiState.collectAsState()
+    val viewState: State<SearchViewState> = viewModel.uiState.collectAsState()
     SearchView(viewModel, viewState)
 }

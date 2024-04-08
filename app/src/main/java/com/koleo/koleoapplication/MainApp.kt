@@ -6,8 +6,6 @@ import com.koleo.koleoapplication.di.modules.HiltWorkerFactoryEntryPoint
 import com.koleo.koleoapplication.utils.WorkersUtil
 import dagger.hilt.EntryPoints
 import dagger.hilt.android.HiltAndroidApp
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltAndroidApp
@@ -16,17 +14,15 @@ class MainApp : Application(), Configuration.Provider {
     @Inject
     lateinit var workersUtil: WorkersUtil
 
-
     override fun onCreate() {
         super.onCreate()
-        GlobalScope.launch {
-            workersUtil.scheduleWorkers()
-        }
-
+        workersUtil.scheduleWorkers()
     }
 
     override val workManagerConfiguration: Configuration
         get() = Configuration.Builder()
-            .setWorkerFactory(EntryPoints.get(this, HiltWorkerFactoryEntryPoint::class.java).workerFactory())
+            .setWorkerFactory(
+                EntryPoints.get(this, HiltWorkerFactoryEntryPoint::class.java).workerFactory()
+            )
             .build()
 }

@@ -2,20 +2,22 @@ package com.koleo.splash
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.koleo.cache.room.dao.StationDao
-import com.koleo.cache.room.dao.StationKeywordDao
+import com.koleo.cache.datasource.CacheStationKeywordsDataSource
+import com.koleo.cache.datasource.CacheStationsDataSource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.zip
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class SplashViewModel @Inject constructor(
-    private val stationsDao: StationDao,
-    private val stationsKeywordDao: StationKeywordDao,
+    private val stationsDataSource: CacheStationsDataSource,
+    private val stationKeywordsDataSource: CacheStationKeywordsDataSource,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SplashViewState())
@@ -23,11 +25,14 @@ class SplashViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            val areStationsPopulated = stationsDao.getStations().isNotEmpty()
-            val areKeywordsPopulated = stationsKeywordDao.getStations().isNotEmpty()
-            _uiState.update { currentState ->
-                currentState.copy(isDataAvailable = areStationsPopulated && areKeywordsPopulated)
-            }
+            stationsDataSource.getStationsFlow()
+                .zip(stationKeywordsDataSource.getStationKeywordsFlow()) { stations, keywords ->
+                    val areStationsPopulated = stations?.isNotEmpty() ?: false
+                    val areKeywordsPopulated = keywords?.isNotEmpty() ?: false
+                    _uiState.update { currentState ->
+                        currentState.copy(isDataAvailable = areStationsPopulated && areKeywordsPopulated)
+                    }
+                }.collect()
         }
     }
 }

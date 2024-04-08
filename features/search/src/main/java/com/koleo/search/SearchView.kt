@@ -1,6 +1,7 @@
 package com.koleo.search
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -13,8 +14,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -32,9 +35,11 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.koleo.mylibrary.R
 import com.koleo.core.R as CoreR
 
 @Composable
@@ -45,97 +50,126 @@ fun SearchView(
     val isSearchInProgress =
         viewState.value.startDestinationSearchInProgress || viewState.value.endDestinationSearchInProgress
 
-    val systemUiController = rememberSystemUiController()
-    systemUiController.setSystemBarsColor(
-        color = Color.White
-    )
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.White)
+            .padding(16.dp)
+    ) {
+        Header()
+        AnimatedVisibilityDefault(!isSearchInProgress) {
+            MainView(searchViewActions, viewState)
+        }
+        AnimatedVisibilityDefault(isSearchInProgress) {
+            Search(searchViewActions, viewState)
+        }
+    }
+}
+
+@Composable
+fun MainView(
+    searchViewActions: SearchScreenActions,
+    viewState: State<SearchViewState>
+) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
+            .background(Color.White)
     ) {
-        Header()
-        AnimatedVisibility(
-            visible = !isSearchInProgress,
-            enter = fadeIn(animationSpec = tween(200)),
-            exit = fadeOut(animationSpec = tween(200))
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-                    .background(Color.White)
-            ) {
-                Text(modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .clickable {
-                        searchViewActions.onStartDestinationClicked()
-                    }
-                    .background(Color(0x60ABABAB))
-                    .padding(16.dp),
-                    text = viewState.value.startDestination?.name ?: "Start Destination")
-                Spacer(modifier = Modifier.height(16.dp))
-                Text(modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .clickable {
-                        searchViewActions.onEndDestinationClicked()
-                    }
-                    .background(Color(0x60ABABAB))
-                    .padding(16.dp),
-                    text = viewState.value.endDestination?.name ?: "End Destination")
+        Text(modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .clickable {
+                searchViewActions.onStartDestinationClicked()
+            }
+            .background(Color(0x60ABABAB))
+            .padding(16.dp),
+            text = viewState.value.startDestination?.name
+                ?: stringResource(R.string.start_destination))
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(8.dp))
+            .clickable {
+                searchViewActions.onEndDestinationClicked()
+            }
+            .background(Color(0x60ABABAB))
+            .padding(16.dp),
+            text = viewState.value.endDestination?.name
+                ?: stringResource(R.string.end_destination))
 
-                viewState.value.distance?.let { distance ->
-                    Spacer(modifier = Modifier.height(16.dp))
+        viewState.value.distance?.let { distance ->
+            Spacer(modifier = Modifier.height(24.dp))
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color(0x60ABABAB))
+                    .padding(16.dp),
+                text = stringResource(
+                    R.string.distance_between_selected_destinations_km,
+                    distance
+                )
+            )
+        }
+    }
+}
+
+@Composable
+fun Search(
+    searchViewActions: SearchScreenActions,
+    viewState: State<SearchViewState>
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .background(Color.White)
+    ) {
+        val hint = if (viewState.value.startDestinationSearchInProgress) {
+            stringResource(R.string.select_start_destination)
+        } else if (viewState.value.endDestinationSearchInProgress) {
+            stringResource(R.string.select_end_destination)
+        } else "..."
+        SearchBar(searchViewActions, hint)
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(vertical = 8.dp)
+        ) {
+            if (viewState.value.searchMessage.isEmpty()) {
+                items(viewState.value.results.count()) { index ->
+                    val result = viewState.value.results.get(index)
                     Text(
+                        text = result.name,
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .clip(RoundedCornerShape(8.dp))
-                            .background(Color(0x60ABABAB))
-                            .padding(24.dp),
-                        text = "Distance between selected destinations: $distance km"
+                            .padding(horizontal = 8.dp, vertical = 12.dp)
+                            .fillMaxSize()
+                            .clickable {
+                                searchViewActions.onKeywordSelected(result)
+                            })
+                    Divider(
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                            .fillMaxWidth(),
+                        thickness = 1.dp,
+                        color = Color.LightGray
+                    )
+
+                }
+            } else if (viewState.value.searchMessage.isNotEmpty()) {
+                item {
+                    Text(
+                        text = stringResource(R.string.no_results_found),
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp, vertical = 12.dp)
+                            .fillMaxSize(),
+                        textAlign = TextAlign.Center,
                     )
                 }
             }
-
         }
-        AnimatedVisibility(
-            visible = isSearchInProgress,
-            enter = fadeIn(animationSpec = tween(200)),
-            exit = fadeOut(animationSpec = tween(200))
-        ) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
-                    .background(Color.White)
-            ) {
-                val hint = if (viewState.value.startDestinationSearchInProgress) {
-                    "Select start destination"
-                } else if (viewState.value.endDestinationSearchInProgress) {
-                    "Select end destination"
-                } else "..."
-                SearchBar(searchViewActions, hint)
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize()
-                ) {
-                    items(viewState.value.keywordsResults.count()) { index ->
-                        val result = viewState.value.keywordsResults.get(index)
-                        Text(
-                            text = result.keyword,
-                            modifier = Modifier
-                                .padding(8.dp)
-                                .fillMaxSize()
-                                .clickable {
-                                    searchViewActions.onKeywordSelected(result)
-                                })
-
-                    }
-                }
-            }
-        }
-
     }
 }
 
@@ -145,7 +179,7 @@ fun Header(modifier: Modifier = Modifier) {
         painterResource(CoreR.drawable.koleo_logo),
         contentDescription = "",
         contentScale = ContentScale.Crop,
-        modifier = modifier.height(60.dp)
+        modifier = modifier.height(64.dp)
     )
 }
 
@@ -179,9 +213,46 @@ fun SearchBar(
             focusedBorderColor = Color.Transparent,
             disabledBorderColor = Color.Transparent
 
-        )
+        ),
+        leadingIcon = {
+            Image(
+                painterResource(R.drawable.arrow_back_24),
+                contentDescription = "",
+                contentScale = ContentScale.Crop,
+                modifier = modifier
+                    .size(24.dp)
+                    .clickable { searchScreenActions.onBackFromSearch() }
+            )
+        },
+        trailingIcon = {
+            Image(
+                painterResource(R.drawable.clear_icon_24),
+                contentDescription = "",
+                contentScale = ContentScale.Crop,
+                modifier = modifier
+                    .size(24.dp)
+                    .clickable {
+                        searchScreenActions.onClearInput()
+                        text = TextFieldValue("")
+                    }
+            )
+        }
     )
     LaunchedEffect(key1 = null) {
         focusRequester.requestFocus()
+    }
+}
+
+@Composable
+fun AnimatedVisibilityDefault(
+    visible: Boolean,
+    content: @Composable AnimatedVisibilityScope.() -> Unit
+) {
+    AnimatedVisibility(
+        visible = visible,
+        enter = fadeIn(animationSpec = tween(200)),
+        exit = fadeOut(animationSpec = tween(200))
+    ) {
+        content()
     }
 }

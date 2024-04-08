@@ -18,13 +18,14 @@ class WorkerModule {
 
     @Singleton
     @Provides
-    fun providesWorkManager(@ApplicationContext context: Context) : WorkManager =
+    fun providesWorkManager(@ApplicationContext context: Context): WorkManager =
         WorkManager.getInstance(context)
 
     @Singleton
     @Provides
     fun providesSyncDeviceActiveScheduler() = DailyWorker.Scheduler
 }
+
 @EntryPoint
 @InstallIn(SingletonComponent::class)
 interface HiltWorkerFactoryEntryPoint {

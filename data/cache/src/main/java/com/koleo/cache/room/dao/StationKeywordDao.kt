@@ -7,12 +7,16 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.koleo.cache.room.entities.StationKeywordEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface StationKeywordDao {
 
     @Query("SELECT * from station_keyword_entity")
-    suspend fun getStations(): List<StationKeywordEntity>
+    suspend fun getStationKeywords(): List<StationKeywordEntity>
+
+    @Query("SELECT * from station_keyword_entity")
+    fun getStationKeywordsFlow(): Flow<List<StationKeywordEntity>?>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(stations: List<StationKeywordEntity>)

@@ -6,7 +6,6 @@ import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Headers
 
-
 interface KoleoApi {
 
     @Headers("X-KOLEO-Version: 1")

@@ -15,6 +15,7 @@
             <option value="$PROJECT_DIR$/data/cache" />
             <option value="$PROJECT_DIR$/data/network" />
             <option value="$PROJECT_DIR$/features" />
+            <option value="$PROJECT_DIR$/features/common" />
             <option value="$PROJECT_DIR$/features/search" />
             <option value="$PROJECT_DIR$/features/splash" />
           </set>

@@ -13,7 +13,7 @@ android {
         applicationId = "com.koleo.koleoapplication"
         minSdk = 24
         targetSdk = 34
-        versionCode = 1
+        versionCode = 4
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -91,8 +91,6 @@ dependencies {
 
     // Hilt compose
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
-
-    implementation("com.google.accompanist:accompanist-systemuicontroller:0.27.0")
 }
 
 kapt {

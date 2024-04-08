@@ -11,4 +11,5 @@ data class StationEntity(
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "latitude") val latitude: Double,
     @ColumnInfo(name = "longitude") val longitude: Double,
+    @ColumnInfo(name = "hits") val hits: Int,
 )

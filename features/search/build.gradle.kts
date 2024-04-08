@@ -48,6 +48,7 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     implementation(project(":data:cache"))
+    implementation(project(":features:common"))
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -68,6 +69,4 @@ dependencies {
 
     // Hilt compose
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
-
-    implementation("com.google.accompanist:accompanist-systemuicontroller:0.27.0")
 }
